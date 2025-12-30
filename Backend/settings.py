@@ -109,12 +109,18 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "https://agri-smart-upolabdhi-backend-4-i6y6.onrender.com",
     "http://localhost:5173",
+    "http://localhost:3000",
+    "http://192.168.1.101:3000",
+    "https://kbtechagre.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://agri-smart-upolabdhi-backend-4-i6y6.onrender.com",
     "https://agri-smart-upolabdhi-backend-3-w22q.onrender.com",
     "http://localhost:5173",
+    "http://localhost:3000",
+    "http://192.168.1.101:3000",
+    "https://kbtechagre.vercel.app",
 ]
 
 CORS_ALLOW_METHODS = [

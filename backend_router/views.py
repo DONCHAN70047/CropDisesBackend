@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
+from PIL import Image
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -55,30 +56,30 @@ def home(request):
 
 # .......................................... DisesDetection ...................................................
 @api_view(['POST'])
-@parser_classes([MultiPartParser])
+@parser_classes([MultiPartParser, FormParser])
 @permission_classes([AllowAny])
 def detect_view(request):
     """
-    API endpoint: POST an image file -> get prediction.
+    API endpoint: POST an image file -> get prediction
     """
-    if request.method == "POST" and request.FILES.get("file"):
-        try:
-            file = request.FILES["file"]
 
-            img = Image.open(file).convert("RGB")  
+    if "image" not in request.FILES:
+        return JsonResponse({"error": "No image uploaded"}, status=400)
 
+    try:
+        file = request.FILES["image"]
 
-            prediction = predict_disease(img)
+        img = Image.open(file).convert("RGB")
 
-            return JsonResponse({
-                "status": "success",
-                "prediction": prediction["class"],
-                "confidence": round(prediction["confidence"], 4)
-            })
+        prediction = predict_disease(img)
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse({
+            "status": "success",
+            "disease": prediction["class"],
+            "confidence": round(float(prediction["confidence"]), 4)
+        })
 
-    return JsonResponse({"error": "No file uploaded"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
     
 # .......................................... DisesDetection ...................................................
