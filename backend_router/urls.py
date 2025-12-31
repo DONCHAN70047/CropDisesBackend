@@ -6,4 +6,5 @@ from .views import home
 urlpatterns = [
     path('detect/', views.detect_view, name="predict_disease_from_image"),
     path('home/', home),
+    path('run-task/', views.run_task, name='run_task'),
 ]

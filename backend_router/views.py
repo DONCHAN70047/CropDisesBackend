@@ -35,6 +35,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import DiseaseDetection
+import time
 
 
 # ...................................................... Secure key ...................................................
@@ -52,6 +53,18 @@ cloudinary.config(
 def home(request):
     return JsonResponse({"status": "Backend is running 🚀"})
 # ...................................................... For start ....................................................
+
+# ....................................................... Frontend run task ...........................................
+@api_view(['POST'])
+def run_task(request):
+    print("Frontend triggered API received!")
+
+    # Simulate backend "sleep" or processing
+    time.sleep(5)  # 5 seconds delay
+    print("Backend sleep done!")
+
+    return Response({"status": "success", "message": "Task finished after sleep"})
+# ..................................................... Frontend run task ............................................
 
 
 # .......................................... DisesDetection ...................................................
