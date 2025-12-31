@@ -34,7 +34,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-
+from .models import DiseaseDetection
 
 
 # ...................................................... Secure key ...................................................
@@ -59,24 +59,34 @@ def home(request):
 @parser_classes([MultiPartParser, FormParser])
 @permission_classes([AllowAny])
 def detect_view(request):
-    """
-    API endpoint: POST an image file -> get prediction
-    """
 
     if "image" not in request.FILES:
         return JsonResponse({"error": "No image uploaded"}, status=400)
 
     try:
-        file = request.FILES["image"]
+        image_file = request.FILES["image"]
 
-        img = Image.open(file).convert("RGB")
+        
+        img = Image.open(image_file).convert("RGB")
 
+  
         prediction = predict_disease(img)
+  
+        record = DiseaseDetection.objects.create(
+            image=image_file,
+            disease_name=prediction["class"],
+            confidence=float(prediction["confidence"])
+        )
+
+      
+        image_url = request.build_absolute_uri(record.image.url)
 
         return JsonResponse({
             "status": "success",
-            "disease": prediction["class"],
-            "confidence": round(float(prediction["confidence"]), 4)
+            "id": record.id,
+            "disease": record.disease_name,
+            "confidence": round(record.confidence, 4),
+            "image_url": image_url
         })
 
     except Exception as e:
