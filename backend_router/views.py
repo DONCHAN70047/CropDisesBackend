@@ -59,8 +59,8 @@ def home(request):
 def run_task(request):
     print("Frontend triggered API received!")
 
-    # Simulate backend "sleep" or processing
-    time.sleep(5)  # 5 seconds delay
+    
+    time.sleep(5)  
     print("Backend sleep done!")
 
     return Response({"status": "success", "message": "Task finished after sleep"})
@@ -78,31 +78,38 @@ def detect_view(request):
 
     try:
         image_file = request.FILES["image"]
+        image_file.seek(0)
 
-        
         img = Image.open(image_file).convert("RGB")
 
-  
         prediction = predict_disease(img)
-  
-        record = DiseaseDetection.objects.create(
-            image=image_file,
-            disease_name=prediction["class"],
-            confidence=float(prediction["confidence"])
-        )
+        print("PREDICTION:", prediction)
 
-      
+        image_file.seek(0)
+
+        record = DiseaseDetection.objects.create(
+    image=image_file,
+    predicted_disease=prediction["class"], 
+    confidence=float(prediction["confidence"])
+)
+
+
         image_url = request.build_absolute_uri(record.image.url)
 
         return JsonResponse({
-            "status": "success",
-            "id": record.id,
-            "disease": record.disease_name,
-            "confidence": round(record.confidence, 4),
-            "image_url": image_url
-        })
+    "status": "success",
+    "id": record.id,
+    "disease": record.predicted_disease,   
+    "confidence": round(record.confidence, 4),
+    "image_name": record.image_name,
+    "image_link": record.image_link,
+    "import_time": record.import_time
+})
+
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JsonResponse({"error": str(e)}, status=500)
-    
+
 # .......................................... DisesDetection ...................................................

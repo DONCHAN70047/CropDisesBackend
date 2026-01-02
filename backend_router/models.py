@@ -1,21 +1,34 @@
-# backend_router/models.py
 from django.db import models
+from django.conf import settings
 
 class DiseaseDetection(models.Model):
-    disease_name = models.CharField(max_length=100)
+    predicted_disease = models.CharField(max_length=100)
     confidence = models.FloatField()
-    image = models.ImageField(upload_to='disease_images/')
-    image_url = models.URLField(max_length=500, blank=True)
-    predicted_at = models.DateTimeField(auto_now_add=True)
+
+    image = models.ImageField(upload_to="disease_images/")
+    image_name = models.CharField(max_length=255, blank=True)
+    image_link = models.URLField(max_length=500, blank=True)
+
+    import_time = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        creating = self.pk is None
         super().save(*args, **kwargs)
 
+        updated = False
+
+       
+        if self.image and not self.image_name:
+            self.image_name = self.image.name.split("/")[-1]
+            updated = True
+
         
-        if creating and self.image and not self.image_url:
-            self.image_url = f"https://cropdisesbackend-1.onrender.com{self.image.url}"
-            super().save(update_fields=['image_url'])
+        if self.image and not self.image_link:
+            base_url = getattr(settings, "PUBLIC_BASE_URL", "")
+            self.image_link = f"{base_url}{self.image.url}"
+            updated = True
+
+        if updated:
+            super().save(update_fields=["image_name", "image_link"])
 
     def __str__(self):
-        return self.disease_name
+        return self.predicted_disease

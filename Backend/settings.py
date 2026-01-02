@@ -122,6 +122,12 @@ CSRF_TRUSTED_ORIGINS = [
     "http://192.168.1.101:3000",
     "https://kbtechagre.vercel.app",
 ]
+# Local
+#PUBLIC_BASE_URL = "http://127.0.0.1:8000"
+
+# Production (Render)
+PUBLIC_BASE_URL = "https://cropdisesbackend-1.onrender.com"
+
 
 CORS_ALLOW_METHODS = [
     'DELETE',
