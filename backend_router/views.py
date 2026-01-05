@@ -36,6 +36,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import DiseaseDetection
 import time
+from ml_pipeline.image_batch_processor import process_new_images
+
+
+
+
 
 
 # ...................................................... Secure key ...................................................
@@ -55,15 +60,13 @@ def home(request):
 # ...................................................... For start ....................................................
 
 # ....................................................... Frontend run task ...........................................
+from ml_pipeline.image_batch_processor import process_new_images
+
 @api_view(['POST'])
 def run_task(request):
-    print("Frontend triggered API received!")
+    process_new_images()
+    return Response({"status": "Task executed successfully"})
 
-    
-    time.sleep(5)  
-    print("Backend sleep done!")
-
-    return Response({"status": "success", "message": "Task finished after sleep"})
 # ..................................................... Frontend run task ............................................
 
 

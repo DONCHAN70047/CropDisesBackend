@@ -1,36 +1,42 @@
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
-import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.optimizers import Adam
 
-def train_model(X_train, y_train, X_val=None, y_val=None, save_path="ml_model.h5"):
-    """
-    Train a simple CNN model on image data
-    """
-    num_classes = len(np.unique(y_train))
-    input_shape = X_train.shape[1:]  # (224,224,3)
+MODEL_PATH = "ml_pipeline/model.keras"
+NUM_CLASSES = 3  # Brown Spot, Sheath Blight, Narrow BLB
 
-    model = Sequential([
-        Conv2D(32, (3,3), activation='relu', input_shape=input_shape),
-        MaxPooling2D(2,2),
-        Conv2D(64, (3,3), activation='relu'),
-        MaxPooling2D(2,2),
-        Flatten(),
-        Dense(128, activation='relu'),
-        Dense(num_classes, activation='softmax')
-    ])
+def load_or_create_model():
+    try:
+        model = load_model(MODEL_PATH)
+        print("Loaded existing model")
+    except:
+        base = tf.keras.applications.MobileNetV2(
+            input_shape=(224,224,3),
+            include_top=False,
+            pooling="avg",
+            weights="imagenet"
+        )
 
-    model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
+        base.trainable = False
 
-    model.fit(
-        X_train, y_train,
-        validation_data=(X_val, y_val) if X_val is not None else None,
-        epochs=5,
-        batch_size=8
-    )
+        model = tf.keras.Sequential([
+            base,
+            Dense(NUM_CLASSES, activation="softmax")
+        ])
 
-    model.save(save_path)
-    print(f"Model saved to {save_path}")
+        model.compile(
+            optimizer=Adam(1e-4),
+            loss="sparse_categorical_crossentropy",
+            metrics=["accuracy"]
+        )
+
     return model
+
+def train_incremental(X, y):
+    model = load_or_create_model()
+
+    model.fit(X, y, epochs=3, batch_size=8)
+
+    model.save(MODEL_PATH)
+    print("Model saved")

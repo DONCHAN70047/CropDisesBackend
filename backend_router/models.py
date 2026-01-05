@@ -9,6 +9,9 @@ class DiseaseDetection(models.Model):
     image_name = models.CharField(max_length=255, blank=True)
     image_link = models.URLField(max_length=500, blank=True)
 
+    image_hash = models.CharField(max_length=64, blank=True, null=True)
+    is_processed = models.BooleanField(default=False)
+
     import_time = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -16,12 +19,10 @@ class DiseaseDetection(models.Model):
 
         updated = False
 
-       
         if self.image and not self.image_name:
             self.image_name = self.image.name.split("/")[-1]
             updated = True
 
-        
         if self.image and not self.image_link:
             base_url = getattr(settings, "PUBLIC_BASE_URL", "")
             self.image_link = f"{base_url}{self.image.url}"

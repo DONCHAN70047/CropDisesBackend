@@ -17,3 +17,9 @@ class DiseaseDetectionAdmin(admin.ModelAdmin):
     def short_image_link(self, obj):
         return obj.image_link
     short_image_link.short_description = "Image URL"
+
+
+
+
+
+
