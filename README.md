@@ -9,7 +9,7 @@ This project uses **Django** as the backend for disease prediction and **Next.js
 ## 🚀 Live Project Links
 
 - **Backend (Django API):**  
-  👉 https://cropdisesbackend-1.onrender.com
+  👉 https://cropdisesbackend-2.onrender.com
 
 - **Frontend (Next.js + React):**  
   👉 https://kbtechagre.vercel.app
